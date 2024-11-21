@@ -112,3 +112,94 @@
     </script>
 </body>
 </html>
+-------------------------
+
+
+<div id="jira-manipulation-script">
+    <script>
+        // Function to manipulate Jira macro output
+        function manipulateJiraOutput() {
+            // Wait for the Jira macro to load
+            setTimeout(() => {
+                // Select the Jira issues table
+                const jiraTable = document.querySelector('.jira-issues-table');
+                if (jiraTable) {
+                    // Extract issues data
+                    const issues = [];
+                    const rows = jiraTable.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const issueLink = row.querySelector('a');
+                        const dueDateCell = row.querySelector('td[data-label="Due date"]');
+                        if (issueLink && dueDateCell) {
+                            const dueDate = new Date(dueDateCell.textContent.trim());
+                            issues.push({
+                                title: issueLink.textContent.trim(),
+                                link: issueLink.href,
+                                dueDate: dueDate
+                            });
+                        }
+                    });
+
+                    // Create a new table for displaying issues by month
+                    const newTable = document.createElement('table');
+                    newTable.style.borderCollapse = 'collapse';
+                    newTable.style.width = '100%';
+                    newTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Issues</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issuesByMonthBody"></tbody>
+                    `;
+
+                    // Group issues by month
+                    const issuesByMonth = {};
+                    issues.forEach(issue => {
+                        const monthYear = issue.dueDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+                        if (!issuesByMonth[monthYear]) {
+                            issuesByMonth[monthYear] = [];
+                        }
+                        issuesByMonth[monthYear].push(issue);
+                    });
+
+                    // Populate the new table with issues grouped by month
+                    const issuesByMonthBody = newTable.querySelector('#issuesByMonthBody');
+                    for (const [monthYear, issues] of Object.entries(issuesByMonth)) {
+                        const row = document.createElement('tr');
+                        const monthCell = document.createElement('td');
+                        monthCell.textContent = monthYear;
+                        monthCell.style.border = '1px solid black';
+                        monthCell.style.padding = '8px';
+                        monthCell.style.textAlign = 'center';
+
+                        const issuesCell = document.createElement('td');
+                        issuesCell.style.border = '1px solid black';
+                        issuesCell.style.padding = '8px';
+                        issuesCell.style.textAlign = 'left';
+                        issues.forEach(issue => {
+                            const issueLink = document.createElement('a');
+                            issueLink.href = issue.link;
+                            issueLink.textContent = issue.title;
+                            issueLink.style.display = 'block';
+                            issuesCell.appendChild(issueLink);
+                        });
+
+                        row.appendChild(monthCell);
+                        row.appendChild(issuesCell);
+                        issuesByMonthBody.appendChild(row);
+                    }
+
+                    // Append the new table to the body
+                    document.body.appendChild(newTable);
+                } else {
+                    console.error('Jira issues table not found.');
+                }
+            }, 2000); // Adjust the timeout as needed
+        }
+
+        // Run the function when the page loads
+        window.onload = manipulateJiraOutput;
+    </script>
+</div>
