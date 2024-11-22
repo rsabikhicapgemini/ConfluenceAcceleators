@@ -88,7 +88,56 @@ async function loadAllTableContent(jiraTableClass) {
 
     return allTableData;
 }
+//Matrix
 
+function createMatrixTableWithYears(tableData) {
+    const matrix = {};
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    // Process the table data
+    tableData.forEach((row, index) => {
+        if (index === 0) return; // Skip header row
+        const dueDate = new Date(row[0]);
+        const component = row[1];
+        const summary = row[2];
+        const monthYear = `${months[dueDate.getMonth()]} ${dueDate.getFullYear()}`;
+
+        if (!matrix[monthYear]) {
+            matrix[monthYear] = {};
+        }
+        if (!matrix[monthYear][component]) {
+            matrix[monthYear][component] = [];
+        }
+        matrix[monthYear][component].push(summary);
+    });
+
+    // Create HTML table with green background
+    let htmlTable = '<table style="background-color: green; border: 1px solid black;">';
+    htmlTable += '<tr><th>Month/Year</th>';
+
+    // Get unique components
+    const components = Array.from(new Set(tableData.slice(1).map(row => row[1])));
+    components.forEach(component => {
+        htmlTable += `<th>${component}</th>`;
+    });
+    htmlTable += '</tr>';
+
+    // Populate the matrix table
+    Object.keys(matrix).forEach(monthYear => {
+        htmlTable += `<tr><td>${monthYear}</td>`;
+        components.forEach(component => {
+            const summaries = matrix[monthYear] && matrix[monthYear][component] ? matrix[monthYear][component].join(', ') : '';
+            htmlTable += `<td style="border: 1px solid black;">${summaries}</td>`;
+        });
+        htmlTable += '</tr>';
+    });
+
+    htmlTable += '</table>';
+    return htmlTable;
+}
 
 // Call the function to check and display the Jira table
 checkJiraTable();
