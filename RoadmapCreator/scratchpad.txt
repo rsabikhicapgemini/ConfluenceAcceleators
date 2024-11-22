@@ -1,0 +1,60 @@
+//Function to load table content into a variable
+
+function loadTableContent(jiraTableClass) {
+    const jiraTable = document.querySelector(`.${jiraTableClass}`);
+    const tableData = [];
+
+    if (jiraTable) {
+        const rows = jiraTable.querySelectorAll('tr');
+        rows.forEach((row) => {
+            const cells = row.querySelectorAll('td, th');
+            const rowData = [];
+            cells.forEach((cell) => {
+                rowData.push(cell.textContent.trim());
+            });
+            tableData.push(rowData);
+        });
+    }
+
+    return tableData;
+}
+
+// Function to dump the data from the object into a table
+
+function createHtmlTable(tableData) {
+    let htmlTable = '<table style="background-color: red; border: 1px solid black;">';
+    tableData.forEach((rowData) => {
+        htmlTable += '<tr>';
+        rowData.forEach((cellData) => {
+            htmlTable += `<td style="border: 1px solid black;">${cellData}</td>`;
+        });
+        htmlTable += '</tr>';
+    });
+    htmlTable += '</table>';
+
+    return htmlTable;
+}
+
+//Function to display the HTML table
+function displayHtmlTable(htmlTable) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.innerHTML = htmlTable;
+}
+
+// Main 
+
+function checkJiraTable() {
+    setTimeout(() => {
+        const tableData = loadTableContent('jira-issues');
+        if (tableData.length > 0) {
+            const htmlTable = createHtmlTable(tableData);
+            displayHtmlTable(htmlTable);
+        } else {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = 'Sorry, Jira Table not found.';
+        }
+    }, 2000); // Adjust the timeout as needed
+}
+
+// Call the function to check and display the Jira table
+checkJiraTable();
