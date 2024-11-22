@@ -45,7 +45,7 @@ function displayHtmlTable(htmlTable) {
 
 function checkJiraTable() {
     setTimeout(() => {
-        const tableData = loadTableContent('jira-issues');
+        const tableData = loadAllTableContent('jira-issues');
         if (tableData.length > 0) {
             const htmlTable = createHtmlTable(tableData);
             displayHtmlTable(htmlTable);
@@ -55,6 +55,40 @@ function checkJiraTable() {
         }
     }, 2000); // Adjust the timeout as needed
 }
+
+ //function to handle pagination
+
+async function loadAllTableContent(jiraTableClass) {
+    let allTableData = [];
+    let hasNextPage = true;
+
+    while (hasNextPage) {
+        const jiraTable = document.querySelector(`.${jiraTableClass}`);
+        if (jiraTable) {
+            const rows = jiraTable.querySelectorAll('tr');
+            rows.forEach((row) => {
+                const cells = row.querySelectorAll('td, th');
+                const rowData = [];
+                cells.forEach((cell) => {
+                    rowData.push(cell.textContent.trim());
+                });
+                allTableData.push(rowData);
+            });
+        }
+
+        // Check if there is a next page and navigate to it
+        const nextPageButton = document.querySelector('.pagination-next');
+        if (nextPageButton && !nextPageButton.disabled) {
+            nextPageButton.click();
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for the next page to load
+        } else {
+            hasNextPage = false;
+        }
+    }
+
+    return allTableData;
+}
+
 
 // Call the function to check and display the Jira table
 checkJiraTable();
