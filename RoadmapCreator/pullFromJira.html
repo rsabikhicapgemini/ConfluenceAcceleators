@@ -203,3 +203,40 @@
         window.onload = manipulateJiraOutput;
     </script>
 </div>
+
+
+---------------------
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jira Issues Check</title>
+</head>
+<body>
+    <h1>Jira Issues Check</h1>
+    <div id="message"></div>
+    <script>
+        // Function to check for the Jira issues table
+        function checkJiraTable() {
+            // Wait for the Jira macro to load
+            setTimeout(() => {
+                // Select the Jira issues table
+                const jiraTable = document.querySelector('.jira-issues');
+                const messageDiv = document.getElementById('message');
+                if (jiraTable) {
+                    messageDiv.textContent = 'Hello, I found the Jira Table!';
+                } else {
+                    messageDiv.textContent = 'Sorry, Jira Table not found.';
+                }
+            }, 2000); // Adjust the timeout as needed
+        }
+
+        // Run the function when the page loads
+        window.onload = checkJiraTable;
+    </script>
+</body>
+</html>
